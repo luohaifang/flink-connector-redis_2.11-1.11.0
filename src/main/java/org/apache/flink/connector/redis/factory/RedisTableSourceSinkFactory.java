@@ -25,7 +25,6 @@ import static org.apache.flink.connector.redis.util.RedisValidator.*;
 /**
  * @ClassName: RedisTableSourceSinkFactory
  * @Description: redis工厂类
- * @author: xiaohai
  * @date: 2020/10/22
  */
 

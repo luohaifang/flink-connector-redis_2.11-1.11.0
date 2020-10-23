@@ -17,7 +17,6 @@ import org.apache.flink.types.Row;
 /**
  * @ClassName: RedisLookupTableSource
  * @Description: 工厂的实现
- * @author: xiaohai
  * @date: 2020/10/22
  */
 

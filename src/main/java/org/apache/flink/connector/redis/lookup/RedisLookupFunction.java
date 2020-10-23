@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * @ClassName: RedisLookupFunction
  * @Description: 取数的工人
- * @author: xiaohai
  * @date: 2020/10/22
  */
 

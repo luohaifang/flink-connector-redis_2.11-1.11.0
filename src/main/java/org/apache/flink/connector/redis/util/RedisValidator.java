@@ -7,7 +7,6 @@ import org.apache.flink.util.Preconditions;
 /**
  * @ClassName: RedisValidator
  * @Description: 参数配置、验证类
- * @author: xiaohai
  * @date: 2020/10/22
  */
 
