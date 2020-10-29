@@ -1,8 +1,6 @@
 <<<<<<< HEAD
 参考https://blog.csdn.net/weixin_47482194/article/details/106528032
 =======
-参考https://blog.csdn.net/weixin_47482194/article/details/106528032
-
 建表语句
 CREATE TABLE redis_dim (
     key String,
