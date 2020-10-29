@@ -69,40 +69,5 @@ public class RedisHashAppendTableFunction extends RichSinkFunction<Row>  {//impl
         super.close();
     }
 
-//    @Override
-//    public void snapshotState(FunctionSnapshotContext context) throws Exception {
-//        //更新服务时间
-//        runTimeState.clear();
-//        String today = sdf.format(LocalDate.now());
-//        for(Tuple3<String,String,String> element :bufferedElements) {
-//            if(!today.equals(element.f1)){
-//                element.setFields(element.f0,today,element.f2+1);
-//                JSONObject jo = new JSONObject();
-//                jo.put("days",element.f2);
-//                jedis.hset(element.f0,"days",jo.toJSONString());
-//            }
-//            runTimeState.add(element);
-//        }
-//        bufferedElements.clear();
-//        for(Tuple3<String,String,String> element :runTimeState.get()) {
-//            bufferedElements.add(element);
-//        }
-//    }
-//
-//    @Override
-//    public void initializeState(FunctionInitializationContext context) throws Exception {
-//        this.runTimeState = context.getOperatorStateStore()
-//                .getListState(new ListStateDescriptor<>("runTime",
-//                        TypeInformation.of(new TypeHint<Tuple3<String, String,String>>() {})));
-//        //故障还原
-//        if(context.isRestored()) {
-//            try {
-//                for(Tuple3<String,String,String> element :runTimeState.get()) {
-//                    bufferedElements.add(element);
-//                }
-//            } catch (Exception e) {
-//                LOG.error("day 初始化失败",e);
-//            }
-//        }
-//    }
+
 }

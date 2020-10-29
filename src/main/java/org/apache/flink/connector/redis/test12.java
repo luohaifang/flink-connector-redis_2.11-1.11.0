@@ -17,7 +17,7 @@ public class test12 {
             "res Map<String,String>\n" +
             ") WITH (\n" +
             "  'connector.type' = 'redis',  \n" +
-            "  'redis.ip' = '192.168.129.114:16379,192.168.129.115:16379,192.168.129.116:16379',  \n" +
+            "  'redis.ip' = 'h:p,h:p,h:p',  \n" +
             "  'database.num' = '0', \n"+//不起作用，不知道是不是只有一个数据库的原因
             "  'operate.tpye' = 'hash', \n" +
             "  'lookup.cache.max-rows' = '3', \n" +
@@ -32,7 +32,7 @@ public class test12 {
             "ress String\n" +
             ") WITH (\n" +
             "  'connector.type' = 'redis',  \n" +
-            "  'redis.ip' = '192.168.129.114:17379,192.168.129.115:17379,192.168.129.116:17379',  \n" +
+            "  'redis.ip' = 'h:p,h:p,h:p',  \n" +
             "  'database.num' = '0', \n"+//不起作用，不知道是不是只有一个数据库的原因
             "  'operate.tpye' = 'hash', \n" +
             "  'redis.version' = '2.6' \n" +
