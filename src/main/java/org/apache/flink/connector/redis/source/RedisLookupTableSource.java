@@ -2,7 +2,6 @@ package org.apache.flink.connector.redis.source;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
-import org.apache.flink.connector.redis.lookup.RedisLookupFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.TableSchema;
@@ -26,21 +25,21 @@ public class RedisLookupTableSource implements LookupableTableSource<Row>, Strea
 
     private final String connectIp;
     private final int databaseNum;
-    private final String readType;
+    private final String operateType;
 
     private final long cacheMaxSize;
     private final long cacheExpireMs;
 
     //获取RedisTableSourceSinkFactory传过来的参数
     private RedisLookupTableSource(String[] fieldNames, TypeInformation[] fieldTypes,
-                                    String connectIp, int databaseNum, String readType,
+                                    String connectIp, int databaseNum, String operateType,
                                    long cacheMaxSize, long cacheExpireMs) {
         this.fieldNames = fieldNames;
         this.fieldTypes = fieldTypes;
 
         this.connectIp = connectIp;
         this.databaseNum = databaseNum;
-        this.readType = readType;
+        this.operateType = operateType;
 
         this.cacheMaxSize = cacheMaxSize;
         this.cacheExpireMs = cacheExpireMs;
@@ -60,7 +59,7 @@ public class RedisLookupTableSource implements LookupableTableSource<Row>, Strea
                 .setFieldTypes(fieldTypes)
                 .setConnectIp(connectIp)
                 .setDatabaseNum(databaseNum)
-                .setReadType(readType)
+                .setOperateType(operateType)
                 .setCacheMaxSize(cacheMaxSize)
                 .setCacheExpireMs(cacheExpireMs)
                 .build();
@@ -102,7 +101,7 @@ public class RedisLookupTableSource implements LookupableTableSource<Row>, Strea
 
         private String connectIp;
         private int databaseNum;
-        private String readType;
+        private String operateType;
 
         private long cacheMaxSize;
         private long cacheExpireMs;
@@ -127,8 +126,8 @@ public class RedisLookupTableSource implements LookupableTableSource<Row>, Strea
             return this;
         }
 
-        public Builder setReadType(String readType) {
-            this.readType = readType;
+        public Builder setOperateType(String operateType) {
+            this.operateType = operateType;
             return this;
         }
 
@@ -144,7 +143,7 @@ public class RedisLookupTableSource implements LookupableTableSource<Row>, Strea
 
         public RedisLookupTableSource build() {
             return new RedisLookupTableSource(fieldNames, fieldTypes,
-                    connectIp, databaseNum, readType,
+                    connectIp, databaseNum, operateType,
                     cacheMaxSize, cacheExpireMs);
         }
     }

@@ -21,7 +21,7 @@ public class RedisValidator extends ConnectorDescriptorValidator {
     public static final String DATABASE_NUM = "database.num";
 
     //读取方式string、hash
-    public static final String READ_TYPE = "read.tpye";
+    public static final String OPERATE_TYPE = "operate.tpye";
 
     //缓存条数
     public static final String LOOKUP_CACHE_MAX_ROWS = "lookup.cache.max-rows";
@@ -51,7 +51,7 @@ public class RedisValidator extends ConnectorDescriptorValidator {
 
     private void validateRriteTypeProperties(DescriptorProperties properties) {
         properties.validateInt(DATABASE_NUM, false, 0);//数据库
-        properties.validateString(READ_TYPE, false, 1);//读取方式
+        properties.validateString(OPERATE_TYPE, false, 1);//读取方式
     }
 
     private void validateCacheProperties(DescriptorProperties properties) {

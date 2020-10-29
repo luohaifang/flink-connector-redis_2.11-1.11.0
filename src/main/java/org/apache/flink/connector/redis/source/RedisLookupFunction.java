@@ -1,4 +1,4 @@
-package org.apache.flink.connector.redis.lookup;
+package org.apache.flink.connector.redis.source;
 
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.cluster.RedisClusterClient;
@@ -33,7 +33,7 @@ public class RedisLookupFunction extends AsyncTableFunction<Row> {
 
     private final String connectIp;
     private final int databaseNum;
-    private final String readType;
+    private final String operateType;
 
     private final long cacheMaxSize;
     private final long cacheExpireMs;
@@ -41,20 +41,20 @@ public class RedisLookupFunction extends AsyncTableFunction<Row> {
     private transient Cache<String, Map<String, String>> cacheHash;
 
     //cluster
-    RedisClusterClient clusterClient;
-    StatefulRedisClusterConnection<String, String> clusterConnection;
-    RedisAdvancedClusterAsyncCommands<String, String> clusterAsyncCommands;
+    private transient RedisClusterClient clusterClient;
+    private transient StatefulRedisClusterConnection<String, String> clusterConnection;
+    private transient RedisAdvancedClusterAsyncCommands<String, String> clusterAsyncCommands;
 
     //构造函数
     public RedisLookupFunction(String[] fieldNames, TypeInformation[] fieldTypes,
-                               String connectIp, int databaseNum, String readType,
+                               String connectIp, int databaseNum, String operateType,
                                long cacheMaxSize, long cacheExpireMs) {
         this.fieldNames = fieldNames;
         this.fieldTypes = fieldTypes;
 
         this.connectIp = connectIp;
         this.databaseNum = databaseNum;
-        this.readType = readType;
+        this.operateType = operateType;
 
         this.cacheMaxSize = cacheMaxSize;
         this.cacheExpireMs = cacheExpireMs;
@@ -70,7 +70,7 @@ public class RedisLookupFunction extends AsyncTableFunction<Row> {
 
         private String connectIp;
         private int databaseNum;
-        private String readType;
+        private String operateType;
 
         private long cacheMaxSize;
         private long cacheExpireMs;
@@ -95,8 +95,8 @@ public class RedisLookupFunction extends AsyncTableFunction<Row> {
             return this;
         }
 
-        public Builder setReadType(String readType) {
-            this.readType = readType;
+        public Builder setOperateType(String operateType) {
+            this.operateType = operateType;
             return this;
         }
 
@@ -112,7 +112,7 @@ public class RedisLookupFunction extends AsyncTableFunction<Row> {
 
         public RedisLookupFunction build() {
             return new RedisLookupFunction(fieldNames, fieldTypes,
-                    connectIp, databaseNum, readType,
+                    connectIp, databaseNum, operateType,
                     cacheMaxSize, cacheExpireMs);
         }
     }
@@ -139,11 +139,12 @@ public class RedisLookupFunction extends AsyncTableFunction<Row> {
     @Override
     public void open(FunctionContext context) throws Exception {
         try {
+            System.out.println("source初始化redis客户端");
             //初始化redis异步客户端
             ArrayList<RedisURI> list = new ArrayList<>();
             String[] ips = connectIp.split(",");
             for (String ip : ips) {
-                list.add(RedisURI.create("redis://"+ip+"/"+databaseNum));
+                list.add(RedisURI.create("redis://"+ip));
             }
             clusterClient = RedisClusterClient.create(list);
             clusterConnection = clusterClient.connect();
@@ -155,13 +156,13 @@ public class RedisLookupFunction extends AsyncTableFunction<Row> {
 
         try {
             //初始化缓存大小
-            if ("hash".equals(readType)) {
+            if ("hash".equals(operateType)) {
                 this.cacheHash = cacheMaxSize <= 0 || cacheExpireMs <= 0 ? null : CacheBuilder.newBuilder()
                         .expireAfterWrite(cacheExpireMs, TimeUnit.SECONDS)
                         .maximumSize(cacheMaxSize)
                         .build();
             }
-            else if ("string".equals(readType)) {
+            else if ("string".equals(operateType)) {
                 this.cache = cacheMaxSize <= 0 || cacheExpireMs <= 0 ? null : CacheBuilder.newBuilder()
                         .expireAfterWrite(cacheExpireMs, TimeUnit.SECONDS)
                         .maximumSize(cacheMaxSize)
@@ -179,7 +180,7 @@ public class RedisLookupFunction extends AsyncTableFunction<Row> {
 
     //取数据，先从缓存拿，是否保存空结果，以防止这个key反复来查redis、导致雪崩
     public void eval(CompletableFuture<Collection<Row>> future, String key) {
-        if ("hash".equals(readType)){
+        if ("hash".equals(operateType)){
             //先从缓存查
             if (cacheHash != null) {
                 Map<String,String> value = cacheHash.getIfPresent(key);
@@ -206,7 +207,7 @@ public class RedisLookupFunction extends AsyncTableFunction<Row> {
             }
 
         }
-        else if ("string".equals(readType)){
+        else if ("string".equals(operateType)){
             //先从缓存查
             if (cache != null) {
                 String value = cache.getIfPresent(key);

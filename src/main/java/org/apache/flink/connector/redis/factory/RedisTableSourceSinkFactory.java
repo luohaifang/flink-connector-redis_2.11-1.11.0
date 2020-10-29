@@ -1,6 +1,6 @@
 package org.apache.flink.connector.redis.factory;
 
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.connector.redis.sink.RedisAppendTableSink;
 import org.apache.flink.connector.redis.source.RedisLookupTableSource;
 import org.apache.flink.connector.redis.util.RedisValidator;
 import org.apache.flink.table.api.TableSchema;
@@ -28,16 +28,29 @@ import static org.apache.flink.connector.redis.util.RedisValidator.*;
  * @date: 2020/10/22
  */
 
-public class RedisTableSourceSinkFactory implements StreamTableSourceFactory<Row>, StreamTableSinkFactory<Tuple2<Boolean, Row>> {
+public class RedisTableSourceSinkFactory implements StreamTableSourceFactory<Row>, StreamTableSinkFactory<Row> {
 
-    //目前不支持redis sink，直接抛出异常
     @Override
-    public StreamTableSink<Tuple2<Boolean, Row>> createStreamTableSink(Map<String, String> properties) {
-        throw new IllegalArgumentException("目前不支持redis sink");
+    public StreamTableSink<Row> createStreamTableSink(Map<String, String> properties) {
+//        System.out.println("工厂类sink");
+        DescriptorProperties descriptorProperties = getValidatedProperties(properties);
+        TableSchema schema = TableSchemaUtils.getPhysicalSchema(descriptorProperties.getTableSchema(SCHEMA));
+
+        RedisAppendTableSink.Builder builder = RedisAppendTableSink.builder()
+                .setTableSchema(schema)
+                .setProperties(properties)
+                .setFieldNames(schema.getFieldNames())
+                .setFieldTypes(schema.getFieldTypes())
+                .setConnectIp(descriptorProperties.getString(CONNECT_IP))
+                .setOperateType(descriptorProperties.getString(OPERATE_TYPE));
+
+        descriptorProperties.getOptionalLong(LOOKUP_CACHE_MAX_ROWS).ifPresent(builder::setCacheMaxSize);
+        descriptorProperties.getOptionalLong(LOOKUP_CACHE_TTL).ifPresent(builder::setCacheExpireMs);
+
+        return builder.build();
+//        throw new IllegalArgumentException("目前不支持redis sink");
     }
 
-    //数据源使用，这里维表包含在里面，其实并不是真正意义上的数据源，
-    //数据源和维表应该分开的，这里就不分了，但是当做数据源使用后面会报错
     @Override
     public StreamTableSource<Row> createStreamTableSource(Map<String, String> properties) {
         //校验参数
@@ -48,7 +61,7 @@ public class RedisTableSourceSinkFactory implements StreamTableSourceFactory<Row
                 .setFieldTypes(schema.getFieldTypes())
                 .setConnectIp(descriptorProperties.getString(CONNECT_IP))
                 .setDatabaseNum(descriptorProperties.getInt(DATABASE_NUM))
-                .setReadType(descriptorProperties.getString(READ_TYPE));
+                .setOperateType(descriptorProperties.getString(OPERATE_TYPE));
 
         descriptorProperties.getOptionalLong(LOOKUP_CACHE_MAX_ROWS).ifPresent(builder::setCacheMaxSize);
         descriptorProperties.getOptionalLong(LOOKUP_CACHE_TTL).ifPresent(builder::setCacheExpireMs);
@@ -73,7 +86,7 @@ public class RedisTableSourceSinkFactory implements StreamTableSourceFactory<Row
 
         properties.add(CONNECT_IP);
         properties.add(DATABASE_NUM);
-        properties.add(READ_TYPE);
+        properties.add(OPERATE_TYPE);
         properties.add(LOOKUP_CACHE_MAX_ROWS);
         properties.add(LOOKUP_CACHE_TTL);
         properties.add(REDIS_VERSION);
