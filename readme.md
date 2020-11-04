@@ -1,6 +1,8 @@
 参考文献  
 参考https://blog.csdn.net/weixin_47482194/article/details/106528032
 
+flink版本：1.11.0  
+
 redis模式：cluster  
 redis api：lettuce  
 
