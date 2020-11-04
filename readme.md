@@ -24,4 +24,4 @@ sink to redis，支持hash、string
 tEnv.executeSql("insert into redis_sink select a1,'chname',chname from restable");
 ```
 
-亲测59000条数据~看起来6得起飞~
+亲测59000条数据\~看起来6得起飞\~
