@@ -4,3 +4,11 @@
 redis  
 模式：cluster  
 api：lettuce  
+
+阔以上传至私服或本地仓库  
+\<dependency\>  
+>\<groupId\>org.apache.flink\<\/groupId\>  
+\<artifactId\>flink-connector-redis_2.11\<\/artifactId\>  
+\<version\>1.0\<\/version\>  
+
+\<\/dependency\>  
